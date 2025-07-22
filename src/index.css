@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --color-theme-bg: #111125;
+  --color-g-start: #687ae4;
+  --color-g-end: #764ea7;
+}
+
+* {
+  font-family: "poppins";
+}
+
+.dot-bg {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 0
+  ) !important;
+  background-size: 20px 20px !important;
+}
+
+.dark-glass {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 25px;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.input {
+  label {
+    color: white;
+    font-weight: 200;
+    font-size: 0.8rem;
+  }
+
+  div {
+    background: #2121258a;
+    border-radius: 10px;
+    backdrop-filter: blur(1px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  input {
+    color: white;
+  }
+
+  input:-webkit-autofill {
+    background-color: transparent !important;
+    color: white !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  div:hover {
+    border: 1px solid rgba(255, 255, 255, 0.63);
+  }
+}
+
+.notification {
+  background: #1b1b41 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  font-size: small;
+  font-weight: 300;
+}
