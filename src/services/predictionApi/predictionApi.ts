@@ -109,6 +109,22 @@ type Project = {
   url?: string;
 };
 
+type AnalyticsResponse = {
+  status: boolean;
+  statusCode: number;
+  message?: string;
+  data?: Analytics;
+};
+
+export type Analytics = {
+  totalCvs: number;
+  totalJds: number;
+  averageMatchTotal: number;
+  averageHireProbability: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  vacanciesByType: any[];
+};
+
 export const predictionApi = createApi({
   reducerPath: "predictionApi",
   baseQuery: fetchBaseQuery({
@@ -148,7 +164,10 @@ export const predictionApi = createApi({
         }
       },
     }),
+    analytics: builder.query<AnalyticsResponse, void>({
+      query: () => "prediction/analytics",
+    }),
   }),
 });
 
-export const { usePredictMutation } = predictionApi;
+export const { usePredictMutation, useLazyAnalyticsQuery } = predictionApi;

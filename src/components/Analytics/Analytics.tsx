@@ -15,8 +15,14 @@ import {
   Legend,
   Title,
 } from "chart.js";
+import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Pie } from "react-chartjs-2";
+import {
+  useLazyAnalyticsQuery,
+  type Analytics,
+} from "../../services/predictionApi/predictionApi";
+import toast from "react-hot-toast";
 
 ChartJS.register(
   CategoryScale,
@@ -27,33 +33,6 @@ ChartJS.register(
   Legend,
   Title
 );
-
-const data = {
-  labels: [
-    "Network Engineer",
-    "Hardware Engineer",
-    "IT Executive",
-    "Software Engineer",
-    "QA Engineer",
-    "Project Manager",
-  ],
-  datasets: [
-    {
-      label: "CV Count",
-      data: [16, 30, 21, 33, 11, 26],
-      backgroundColor: [
-        "#a79bfa", // Network Engineer (lavender)
-        "#93e4d2", // Hardware Engineer (mint green)
-        "#4a66f0", // IT Executive (blue)
-        "#94c7fd", // Software Engineer (light blue)
-        "#adc6ec", // QA Engineer (pale blue)
-        "#97f2cb", // Project Manager (light green)
-      ],
-      borderRadius: 8,
-      barThickness: 40,
-    },
-  ],
-};
 
 const options = {
   responsive: true,
@@ -165,6 +144,47 @@ const options = {
 // };
 
 const Analytics = () => {
+  const [analytics, setAnalytics] = useState<Analytics | undefined>(undefined);
+
+  const [trigger] = useLazyAnalyticsQuery();
+
+  const loadData = async () => {
+    try {
+      const analyticsResponse = await trigger().unwrap();
+      if (analyticsResponse.status) {
+        setAnalytics(analyticsResponse.data);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log("🚀 ~ loadData ~ error:", error);
+      toast.error(error?.message as string);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const data = {
+    labels: analytics?.vacanciesByType?.map((vacancy) => vacancy._id) || [],
+    datasets: [
+      {
+        label: "Vacancy Count",
+        data: analytics?.vacanciesByType?.map((vacancy) => vacancy.total) || [],
+        backgroundColor: [
+          "#a79bfa",
+          "#93e4d2",
+          "#4a66f0",
+          "#94c7fd",
+          "#adc6ec",
+          "#97f2cb",
+        ],
+        borderRadius: 8,
+        barThickness: 40,
+      },
+    ],
+  };
+
   return (
     <>
       <div className={"w-full h-full overflow-y-auto"}>
@@ -179,7 +199,7 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Total CVs processed</p>
-                    <p className="my-3 text-2xl">500</p>
+                    <p className="my-3 text-2xl">{analytics?.totalCvs}</p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
@@ -193,7 +213,7 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Total JDs uploaded</p>
-                    <p className="my-3 text-2xl">250</p>
+                    <p className="my-3 text-2xl">{analytics?.totalJds}</p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
@@ -207,7 +227,9 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Average Match Score</p>
-                    <p className="my-3 text-2xl">0.8</p>
+                    <p className="my-3 text-2xl">
+                      {parseFloat(`${analytics?.averageMatchTotal}`).toFixed(2)}
+                    </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
@@ -221,7 +243,11 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Average Hire Probability</p>
-                    <p className="my-3 text-2xl">0.87</p>
+                    <p className="my-3 text-2xl">
+                      {parseFloat(
+                        `${analytics?.averageHireProbability}`
+                      ).toFixed(2)}
+                    </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
