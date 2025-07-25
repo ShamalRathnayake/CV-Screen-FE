@@ -235,9 +235,9 @@ const Analytics = () => {
                   <div>
                     <p className="text-md">Average Match Score</p>
                     <p className="my-3 text-2xl">
-                      {parseFloat(`${analytics?.averageMatchTotal}`).toFixed(
-                        2
-                      ) || 0}
+                      {parseFloat(
+                        `${analytics?.averageMatchTotal || 0}`
+                      ).toFixed(2)}
                     </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
@@ -254,8 +254,8 @@ const Analytics = () => {
                     <p className="text-md">Average Hire Probability</p>
                     <p className="my-3 text-2xl">
                       {parseFloat(
-                        `${analytics?.averageHireProbability}`
-                      ).toFixed(2) || 0}
+                        `${analytics?.averageHireProbability || 0}`
+                      ).toFixed(2)}
                     </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
