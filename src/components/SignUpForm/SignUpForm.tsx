@@ -2,7 +2,7 @@ import z from "zod";
 import type { RegisterRequest } from "../../services/userApi/userApi";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TextInput from "../TextInput/TextInput";
 import {
   faEnvelope,
@@ -58,10 +58,15 @@ const SignUpForm = ({ submitFormData }: SignUpFormProps) => {
     register,
     handleSubmit,
     formState: { errors, touchedFields, isValid },
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(registerSchema),
     mode: "all",
   });
+
+  useEffect(() => {
+    reset();
+  }, []);
 
   const [passwordVisibility, setPasswordVisibility] = useState(false);
   const [confirmPasswordVisibility, setConfirmPasswordVisibility] =

@@ -28,7 +28,7 @@ type RegisterResponse = {
   };
 };
 
-type PaymentResponse = {
+type GenericResponse = {
   status: boolean;
   statusCode: number;
   message: string;
@@ -63,10 +63,17 @@ export const userApi = createApi({
         }
       },
     }),
-    payment: builder.query<PaymentResponse, void>({
+    payment: builder.query<GenericResponse, void>({
       query: () => "user/payment",
+    }),
+    checkEmail: builder.query<GenericResponse, string>({
+      query: (email) => `user/check-email?email=${email}`,
     }),
   }),
 });
 
-export const { useSignupMutation, useLazyPaymentQuery } = userApi;
+export const {
+  useSignupMutation,
+  useLazyPaymentQuery,
+  useLazyCheckEmailQuery,
+} = userApi;

@@ -5,6 +5,7 @@ import { useAppDispatch } from "../../state/useAppDispatch";
 import { setLoadingState } from "../../state/settings/settingsSlice";
 import toast from "react-hot-toast";
 import {
+  useLazyCheckEmailQuery,
   useSignupMutation,
   type RegisterRequest,
 } from "../../services/userApi/userApi";
@@ -19,6 +20,7 @@ const SignUpPage = () => {
   const [formData, setFormData] = useState<RegisterRequest | null>(null);
 
   const [signup, { isLoading }] = useSignupMutation();
+  const [trigger] = useLazyCheckEmailQuery();
 
   const dispatch = useAppDispatch();
 
@@ -40,7 +42,17 @@ const SignUpPage = () => {
     }
   };
 
-  const formSubmitHandler = (data: RegisterRequest) => {
+  const formSubmitHandler = async (data: RegisterRequest) => {
+    dispatch(setLoadingState({ isLoading: true }));
+
+    const checkEmailResponse = await trigger(data.email, true);
+    if (checkEmailResponse.data?.data) {
+      toast.error("Account already exists with given email");
+      dispatch(setLoadingState({ isLoading: false }));
+      return;
+    }
+    dispatch(setLoadingState({ isLoading: false }));
+
     setFormData(data);
     setActiveTab("2");
   };

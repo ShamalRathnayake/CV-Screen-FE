@@ -148,12 +148,12 @@ const LoginPage = () => {
                       Sign Up here
                     </span>
                   </p>
-                  <p
+                  {/* <p
                     className="mt-1 mb-4 text-center text-xs text-blue-400 cursor-pointer"
                     onClick={() => navigate("/forgot-password")}
                   >
                     Forgot your password?
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>

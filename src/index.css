@@ -4,6 +4,9 @@
   --color-theme-bg: #111125;
   --color-g-start: #687ae4;
   --color-g-end: #764ea7;
+  --color-title: #f1f5f9;
+  --color-sub: #cecdcd;
+  --color-sub-text: #b2b2b2;
 }
 
 * {
@@ -21,15 +24,74 @@
 
 .dark-glass {
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 25px;
+  border-radius: 15px;
   backdrop-filter: blur(1px);
   border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #cecdcd;
 }
 .glass {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
+  border-radius: 15px;
   backdrop-filter: blur(1px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.success-main {
+  background: #198279;
+  border-radius: 25px;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(9, 101, 38, 0.5);
+}
+
+.failure-main {
+  background: #5d232e;
+  border-radius: 25px;
+  backdrop-filter: blur(1px);
+  border: 1px solid #571d27;
+}
+
+.success-glass {
+  background: #1d3f43;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(9, 101, 38, 0.5);
+}
+
+.info-glass {
+  background: #052a4f;
+  backdrop-filter: blur(1px);
+  border: 1px solid #124980;
+}
+
+.warn-glass {
+  background: #534e0455;
+  backdrop-filter: blur(1px);
+  border: 1px solid #c1b6237d;
+}
+
+.error-glass {
+  background: #800d0d44;
+  backdrop-filter: blur(1px);
+  border: 1px solid #800d0da2;
+}
+
+.inner-card {
+  background: #23243cf1;
+  border-radius: 10px;
+  backdrop-filter: blur(1px);
+  border: 1px dashed #4d5da9;
+}
+
+.glass-hover:hover {
+  background: #052a4f;
+  backdrop-filter: blur(1px);
+  border: 1px solid #124980;
+}
+
+.jd-card {
+  background: #222332f1;
+  border-radius: 10px;
+  backdrop-filter: blur(1px);
+  border: 1px solid #717278;
 }
 
 .input {
