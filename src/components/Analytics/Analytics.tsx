@@ -23,6 +23,8 @@ import {
   type Analytics,
 } from "../../services/predictionApi/predictionApi";
 import toast from "react-hot-toast";
+import { useAppDispatch } from "../../state/useAppDispatch";
+import { setLoadingState } from "../../state/settings/settingsSlice";
 
 ChartJS.register(
   CategoryScale,
@@ -148,16 +150,21 @@ const Analytics = () => {
 
   const [trigger] = useLazyAnalyticsQuery();
 
+  const dispatch = useAppDispatch();
+
   const loadData = async () => {
+    dispatch(setLoadingState({ isLoading: true }));
     try {
       const analyticsResponse = await trigger().unwrap();
       if (analyticsResponse.status) {
         setAnalytics(analyticsResponse.data);
       }
+      dispatch(setLoadingState({ isLoading: false }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log("🚀 ~ loadData ~ error:", error);
       toast.error(error?.message as string);
+      dispatch(setLoadingState({ isLoading: false }));
     }
   };
 
@@ -199,7 +206,7 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Total CVs processed</p>
-                    <p className="my-3 text-2xl">{analytics?.totalCvs}</p>
+                    <p className="my-3 text-2xl">{analytics?.totalCvs || 0}</p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
@@ -213,7 +220,7 @@ const Analytics = () => {
                 <div className="flex">
                   <div>
                     <p className="text-md">Total JDs uploaded</p>
-                    <p className="my-3 text-2xl">{analytics?.totalJds}</p>
+                    <p className="my-3 text-2xl">{analytics?.totalJds || 0}</p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
                     <FontAwesomeIcon
@@ -228,7 +235,9 @@ const Analytics = () => {
                   <div>
                     <p className="text-md">Average Match Score</p>
                     <p className="my-3 text-2xl">
-                      {parseFloat(`${analytics?.averageMatchTotal}`).toFixed(2)}
+                      {parseFloat(`${analytics?.averageMatchTotal}`).toFixed(
+                        2
+                      ) || 0}
                     </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
@@ -246,7 +255,7 @@ const Analytics = () => {
                     <p className="my-3 text-2xl">
                       {parseFloat(
                         `${analytics?.averageHireProbability}`
-                      ).toFixed(2)}
+                      ).toFixed(2) || 0}
                     </p>
                   </div>
                   <div className="flex flex-grow align-center items-center justify-end mt-3">
@@ -258,9 +267,12 @@ const Analytics = () => {
                 </div>
               </div>
             </div>
-            <div className="flex w-full justify-between align-center mt-15 glass p-6  mb-10 min-h-[50vh]">
-              <Bar data={data} options={options} />
-            </div>
+            {analytics?.vacanciesByType &&
+              analytics?.vacanciesByType?.length > 0 && (
+                <div className="flex w-full justify-between align-center mt-15 glass p-6  mb-10 min-h-[50vh]">
+                  <Bar data={data} options={options} />
+                </div>
+              )}
             {/* <div className="flex w-full justify-between align-center mt-5 mb-10 glass p-6 h-[50vh]">
               <div className="w-full">
                 <div className="flex h-full">
