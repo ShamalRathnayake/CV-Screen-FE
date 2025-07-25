@@ -1,5 +1,8 @@
-import { Button, ConfigProvider } from "antd";
+import { Button, ConfigProvider, Modal } from "antd";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../state/useAppDispatch";
+import { logout } from "../../state/auth/authSlice";
 
 const NavBarButton = ({
   btnText,
@@ -10,9 +13,22 @@ const NavBarButton = ({
 }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
-    navigate(pathName);
+    if (pathName === "/signout") showModal();
+    else navigate(pathName);
+  };
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  const hideModal = () => {
+    dispatch(logout());
+    setOpen(false);
   };
 
   return (
@@ -39,6 +55,41 @@ const NavBarButton = ({
       >
         {btnText}
       </Button>
+      <ConfigProvider
+        theme={{
+          components: {
+            Modal: {
+              contentBg: "#052a4f",
+              headerBg: "#052a4f",
+              titleColor: "#ffffff",
+            },
+          },
+        }}
+      >
+        <Modal
+          title="Logout"
+          open={open}
+          onOk={hideModal}
+          onCancel={hideModal}
+          okText="Sign Out"
+          cancelText="Cancel"
+          centered
+          closable={false}
+          maskClosable={false}
+          cancelButtonProps={{
+            style: {
+              background: "#2B8128FF",
+            },
+          }}
+          okButtonProps={{
+            style: {
+              background: "#8B1414FF",
+            },
+          }}
+        >
+          <p className="text-white">Are you sure to logout?</p>
+        </Modal>
+      </ConfigProvider>
     </ConfigProvider>
   );
 };

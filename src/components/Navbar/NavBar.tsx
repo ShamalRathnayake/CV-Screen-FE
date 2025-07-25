@@ -3,9 +3,14 @@ import NavBarButton from "./NavBarButton";
 type NavBarprops = {
   isHomeActive?: boolean;
   isSignInActive?: boolean;
+  isSignOutActive?: boolean;
 };
 
-const NavBar = ({ isHomeActive, isSignInActive }: NavBarprops) => {
+const NavBar = ({
+  isHomeActive,
+  isSignInActive,
+  isSignOutActive,
+}: NavBarprops) => {
   return (
     <div className={"w-full h-[70px]"}>
       <div
@@ -33,6 +38,11 @@ const NavBar = ({ isHomeActive, isSignInActive }: NavBarprops) => {
             {isSignInActive && (
               <div className="flex-auto flex justify-end ">
                 <NavBarButton btnText="Sign In" pathName="/login" />
+              </div>
+            )}
+            {isSignOutActive && (
+              <div className="flex-auto flex justify-end ">
+                <NavBarButton btnText="Sign Out" pathName="/signout" />
               </div>
             )}
           </div>

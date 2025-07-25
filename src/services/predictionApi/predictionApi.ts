@@ -125,6 +125,19 @@ export type Analytics = {
   vacanciesByType: any[];
 };
 
+// type PredictionsResponse = {
+//   status: boolean;
+//   statusCode: number;
+//   message?: string;
+//   data?: {
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     predictions: any[];
+//     total: number;
+//     page: number;
+//     limit: number;
+//   };
+// };
+
 export const predictionApi = createApi({
   reducerPath: "predictionApi",
   baseQuery: fetchBaseQuery({
@@ -167,7 +180,15 @@ export const predictionApi = createApi({
     analytics: builder.query<AnalyticsResponse, void>({
       query: () => "prediction/analytics",
     }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    predictions: builder.query<any, { limit: number; page: number }>({
+      query: ({ limit, page }) => `prediction/?limit=${limit}&page=${page}`,
+    }),
   }),
 });
 
-export const { usePredictMutation, useLazyAnalyticsQuery } = predictionApi;
+export const {
+  usePredictMutation,
+  useLazyAnalyticsQuery,
+  useLazyPredictionsQuery,
+} = predictionApi;

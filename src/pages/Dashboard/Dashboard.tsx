@@ -12,7 +12,11 @@ const Dashboard = () => {
       <div className={"w-screen h-screen bg-(--color-theme-bg) dot-bg"}>
         <div className={"flex flex-col w-screen h-screen"}>
           <div className={"w-full h-auto"}>
-            <NavBar isHomeActive={true} isSignInActive={false} />
+            <NavBar
+              isHomeActive={true}
+              isSignInActive={false}
+              isSignOutActive={true}
+            />
           </div>
           <div className={"w-full h-full relative overflow-y-auto"}>
             <div

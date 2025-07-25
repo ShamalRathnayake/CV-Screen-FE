@@ -17,14 +17,21 @@ import {
 } from "chart.js";
 import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { Pie } from "react-chartjs-2";
 import {
   useLazyAnalyticsQuery,
+  useLazyPredictionsQuery,
   type Analytics,
 } from "../../services/predictionApi/predictionApi";
 import toast from "react-hot-toast";
 import { useAppDispatch } from "../../state/useAppDispatch";
 import { setLoadingState } from "../../state/settings/settingsSlice";
+import { Button, ConfigProvider, Table, type TableProps } from "antd";
+import { FilePdfOutlined } from "@ant-design/icons";
+import {
+  setJdFiles,
+  setSelectedCvFile,
+} from "../../state/predictions/predictionsSlice";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -76,79 +83,17 @@ const options = {
   },
 };
 
-// const rawData = [
-//   { label: "Colombo", value: 52.1, color: "#4a66f0" }, // Blue
-//   { label: "Kandy", value: 22.8, color: "#94c7fd" }, // Light Blue
-//   { label: "Negombo", value: 13.9, color: "#97f2cb" }, // Mint
-//   { label: "Other", value: 11.2, color: "#cccccc" }, // Grey
-// ];
-
-// const pieData = {
-//   labels: rawData.map((d) => d.label),
-//   datasets: [
-//     {
-//       data: rawData.map((d) => d.value),
-//       backgroundColor: rawData.map((d) => d.color),
-//       borderColor: "rgba(255, 255, 255, 0.1)",
-//       borderWidth: 4,
-//       cutout: "60%",
-//     },
-//   ],
-// };
-
-// const pieOptions = {
-//   responsive: true,
-//   maintainAspectRatio: true,
-//   plugins: {
-//     legend: {
-//       position: "right" as const,
-//       labels: {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         generateLabels: (chart: any) => {
-//           const data = chart.data;
-//           if (!data.labels || !data.datasets.length) return [];
-//           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//           return data.labels.map((label: any, i: number) => {
-//             const value = chart.data.datasets[0].data[i];
-//             return {
-//               text: `${label}  ${value.toFixed(1)}%`,
-//               fillStyle: chart.data.datasets[0].backgroundColor[i],
-//               strokeStyle: chart.data.datasets[0].backgroundColor[i],
-//               index: i,
-//             };
-//           });
-//         },
-//         color: "#FFFFFFFF",
-//         font: {
-//           size: 13,
-//         },
-//         boxWidth: 12,
-//         padding: 15,
-//       },
-//     },
-//     tooltip: {
-//       backgroundColor: "#1f1f2e",
-//       titleColor: "#ffffff",
-//       bodyColor: "#d1d1d1",
-//     },
-//     title: {
-//       display: true,
-//       text: "Candidates by Location",
-//       color: "#ffffff",
-//       font: {
-//         size: 18,
-//       },
-//       padding: {
-//         bottom: 20,
-//       },
-//     },
-//   },
-// };
-
 const Analytics = () => {
   const [analytics, setAnalytics] = useState<Analytics | undefined>(undefined);
+  const navigate = useNavigate();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [tableData, setTableData] = useState<any>([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const [trigger] = useLazyAnalyticsQuery();
+  const [predTrigger] = useLazyPredictionsQuery();
 
   const dispatch = useAppDispatch();
 
@@ -159,6 +104,23 @@ const Analytics = () => {
       if (analyticsResponse.status) {
         setAnalytics(analyticsResponse.data);
       }
+
+      const predictionsResponse = await predTrigger({ limit, page }).unwrap();
+      if (predictionsResponse.status) {
+        const data = predictionsResponse?.data?.predictions?.map(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (pred: any, index: number) => ({
+            key: index,
+            name: pred?.result[0]?.extractedCv?.personalInfo?.fullName,
+            email: pred?.result[0]?.extractedCv?.personalInfo?.email,
+            phone: pred?.result[0]?.extractedCv?.personalInfo?.phone,
+            pred,
+          })
+        );
+
+        setTableData(data);
+      }
+
       dispatch(setLoadingState({ isLoading: false }));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -171,6 +133,17 @@ const Analytics = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleReportBtnClick = async (record: any) => {
+    dispatch(
+      setSelectedCvFile({
+        cvFile: record?.pred?.result[0],
+      })
+    );
+    dispatch(setJdFiles({ jdFile: record?.pred?.extractedJD }));
+    navigate("/result");
+  };
 
   const data = {
     labels: analytics?.vacanciesByType?.map((vacancy) => vacancy._id) || [],
@@ -191,6 +164,42 @@ const Analytics = () => {
       },
     ],
   };
+
+  const columns: TableProps["columns"] = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button
+          type="primary"
+          variant="filled"
+          color="blue"
+          shape="round"
+          icon={<FilePdfOutlined />}
+          size={"small"}
+          className="w-full"
+          onClick={() => handleReportBtnClick(record)}
+        >
+          View Report
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -273,18 +282,41 @@ const Analytics = () => {
                   <Bar data={data} options={options} />
                 </div>
               )}
-            {/* <div className="flex w-full justify-between align-center mt-5 mb-10 glass p-6 h-[50vh]">
+            <div className="flex w-full justify-between align-center mt-5 mb-10 glass p-6">
               <div className="w-full">
                 <div className="flex h-full">
                   <div className="">
-                    <div className="w-full  inline-block">
-                      <Pie data={pieData} options={pieOptions} />
+                    <div className="w-full h-full  inline-block">
+                      {tableData && (
+                        <ConfigProvider
+                          theme={{
+                            token: {
+                              colorBgContainer: "rgba(0, 0, 0, 0.2)",
+                              colorText: "#fff",
+                              fontSize: 12,
+                              colorPrimaryBorder: "#000)",
+                            },
+                            components: {
+                              Table: {
+                                borderColor: "#000",
+                              },
+                            },
+                          }}
+                        >
+                          <Table
+                            columns={columns}
+                            dataSource={tableData}
+                            size="large"
+                            className="w-full"
+                          />
+                        </ConfigProvider>
+                      )}
                     </div>
                   </div>
                   <div className="flex-grow"></div>
                 </div>
               </div>
-            </div> */}
+            </div>
           </div>
         </div>
       </div>
